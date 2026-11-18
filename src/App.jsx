@@ -92,18 +92,24 @@ export default function App() {
 
   const handleSearch = async (e) => {
   e.preventDefault();
+
+  if (!searchQuery.trim()) {
+    showNotification("Por favor, ingresa un nombre para buscar.", "error");
+    return;
+  }
+
   setIsSearching(true);
-  setSearchError('');
   setSearchResult(null);
 
   try {
-    const queryTerm = normalizeName(searchName);
-    const participantsRef = collection(db, "events", "pcc", "participants");
-    const querySnapshot = await getDocs(participantsRef);
+    const queryTerm = normalizeName(searchQuery);
+    // Ruta donde se guardan los registros
+    const regalosRef = collection(db, 'artifacts', "pcc", 'public', 'data', 'regalos');
+    const querySnapshot = await getDocs(regalosRef);
 
     let foundParticipant = null;
 
-    // Busca si la palabra ingresada está incluida en algún nombre de la BD
+    // Búsqueda flexible
     querySnapshot.forEach((docSnap) => {
       const data = docSnap.data();
       const dbName = normalizeName(data.name);
@@ -116,15 +122,16 @@ export default function App() {
     if (foundParticipant) {
       setSearchResult(foundParticipant);
     } else {
-      setSearchError('No se encontró a nadie con ese nombre. Intenta escribir solo un nombre o apellido.');
+      setSearchResult('NOT_FOUND'); // Respeta la lógica de tu código
+      showNotification('No se encontró a nadie con ese nombre. Intenta con un solo nombre o apellido.', 'error');
     }
-    } catch (error) {
+  } catch (error) {
     console.error("Error buscando: ", error);
-    setSearchError('Hubo un error al buscar. Intenta de nuevo.');
-    } finally {
+    showNotification('Hubo un error al buscar en la base de datos. Intenta de nuevo.', 'error');
+  } finally {
     setIsSearching(false);
-    }
-  };
+  }
+};
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-800 flex flex-col">
