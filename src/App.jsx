@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Gift, Search, Send, AlertCircle, CheckCircle2, TreePine, Star, Snowflake, User, List } from 'lucide-react';
 import { initializeApp } from 'firebase/app';
-import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
+import { getFirestore, doc, setDoc, getDoc, collection, getDocs} from 'firebase/firestore';
 
 // --- Configuración Real de Firebase ---
 const firebaseConfig = {
@@ -44,10 +44,13 @@ export default function App() {
     setMyGifts(newGifts);
   };
 
-  const normalizeName = (name) => {
-    // Convierte a minúsculas, quita espacios al inicio/fin y reemplaza espacios intermedios por guiones
-    return name.trim().toLowerCase().replace(/\s+/g, '-');
-  };
+  const normalizeName = (str) => {
+    return str
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "") // Quita tildes
+      .trim();
+};
 
   // --- Manejadores de Firebase ---
   const handleRegisterGifts = async (e) => {
@@ -77,8 +80,8 @@ export default function App() {
       
       showNotification("¡Tus opciones de regalo se han guardado exitosamente!");
       // Opcional: limpiar formulario después de guardar
-      // setMyName('');
-      // setMyGifts(['', '', '']);
+      setMyName('');
+      setMyGifts(['', '', '']);
     } catch (error) {
       console.error("Error guardando regalos:", error);
       showNotification("Hubo un error al guardar tu lista. Intenta nuevamente.", "error");
@@ -88,28 +91,38 @@ export default function App() {
   };
 
   const handleSearch = async (e) => {
-    e.preventDefault();
-    if (!searchQuery.trim()) return;
+  e.preventDefault();
+  setIsSearching(true);
+  setSearchError('');
+  setSearchResult(null);
 
-    setIsSearching(true);
-    setSearchResult(null);
+  try {
+    const queryTerm = normalizeName(searchName);
+    const participantsRef = collection(db, "events", "pcc", "participants");
+    const querySnapshot = await getDocs(participantsRef);
 
-    try {
-      const documentId = normalizeName(searchQuery);
-      const docRef = doc(db, 'artifacts', "pcc", 'public', 'data', 'regalos', documentId);
-      
-      const docSnap = await getDoc(docRef);
+    let foundParticipant = null;
 
-      if (docSnap.exists()) {
-        setSearchResult(docSnap.data());
-      } else {
-        setSearchResult('NOT_FOUND');
+    // Busca si la palabra ingresada está incluida en algún nombre de la BD
+    querySnapshot.forEach((docSnap) => {
+      const data = docSnap.data();
+      const dbName = normalizeName(data.name);
+
+      if (dbName.includes(queryTerm) || queryTerm.includes(dbName)) {
+        foundParticipant = data;
       }
+    });
+
+    if (foundParticipant) {
+      setSearchResult(foundParticipant);
+    } else {
+      setSearchError('No se encontró a nadie con ese nombre. Intenta escribir solo un nombre o apellido.');
+    }
     } catch (error) {
-      console.error("Error buscando regalos:", error);
-      showNotification("Hubo un error al buscar. Intenta nuevamente.", "error");
+    console.error("Error buscando: ", error);
+    setSearchError('Hubo un error al buscar. Intenta de nuevo.');
     } finally {
-      setIsSearching(false);
+    setIsSearching(false);
     }
   };
 
