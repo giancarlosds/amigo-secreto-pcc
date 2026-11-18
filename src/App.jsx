@@ -182,7 +182,7 @@ export default function App() {
               🎅
             </div>
             <img 
-              src="/logo-navidad.jpg" 
+              src="/public/logo-pcc-navidad.png" 
               alt="Logo PCC Navideño" 
               className="h-20 sm:h-24 object-contain relative z-10 rounded-xl"
             />
