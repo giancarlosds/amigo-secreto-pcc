@@ -67,7 +67,7 @@ export default function App() {
     setIsSubmitting(true);
     try {
       const documentId = normalizeName(myName);
-      const docRef = doc(db, 'artifacts', envAppId, 'public', 'data', 'regalos', documentId);
+      const docRef = doc(db, 'artifacts', "pcc", 'public', 'data', 'regalos', documentId);
       
       await setDoc(docRef, {
         name: myName.trim(),
@@ -96,7 +96,7 @@ export default function App() {
 
     try {
       const documentId = normalizeName(searchQuery);
-      const docRef = doc(db, 'artifacts', envAppId, 'public', 'data', 'regalos', documentId);
+      const docRef = doc(db, 'artifacts', "pcc", 'public', 'data', 'regalos', documentId);
       
       const docSnap = await getDoc(docRef);
 
