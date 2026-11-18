@@ -99,7 +99,7 @@ export default function App() {
         setSearchResult(foundParticipants);
       } else {
         setSearchResult('NOT_FOUND');
-        showNotification('No se encontró a nadie con ese nombre.', 'error');
+        showNotification('Tu amigo secreto aún no registra sus opciones de regalo o no haz ingresado su nombre correctamente.', 'error');
       }
     } catch (error) {
       console.error("Error buscando: ", error);
