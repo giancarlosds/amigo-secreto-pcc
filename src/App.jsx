@@ -198,7 +198,7 @@ export default function App() {
               <Snowflake className="w-8 h-8 text-blue-200 animate-spin-slow" />
             </h1>
             <span className="text-emerald-50 mt-2 font-semibold bg-black/20 backdrop-blur-sm inline-block px-5 py-2 rounded-full border border-emerald-600/50 shadow-inner">
-              Presupuesto máximo: S/ 50.00
+              Presupuesto: S/ 50.00
             </span>
           </div>
         </div>
