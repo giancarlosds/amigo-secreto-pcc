@@ -261,7 +261,7 @@ export default function App() {
 
               <div className="space-y-4">
                 <label className="block text-sm font-bold text-slate-700 mb-2">
-                  Opciones de Regalo (Máx. S/ 50.00)
+                  Opciones de Regalo
                 </label>
                 
                 {[0, 1, 2].map((index) => (
@@ -273,7 +273,7 @@ export default function App() {
                       type="text"
                       value={myGifts[index]}
                       onChange={(e) => updateGift(index, e.target.value)}
-                      placeholder={`Opción de regalo ${index + 1}${index === 0 ? ' (Obligatorio)' : ' (Opcional)'}`}
+                      placeholder={`Opción de regalo`}
                       className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:ring-0 focus:border-emerald-500 transition-colors"
                       required={index === 0}
                     />
